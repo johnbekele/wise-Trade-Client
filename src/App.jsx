@@ -8,6 +8,10 @@ import NewsAnalysis from './pages/NewsAnalysis'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import EmailVerification from './pages/EmailVerification'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
+import ResendVerification from './pages/ResendVerification'
+import AdminPanel from './pages/AdminPanel'
 import Layout from './components/Layout'
 
 // Create React Query client
@@ -32,11 +36,15 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/verify-email" element={<EmailVerification />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/resend-verification" element={<ResendVerification />} />
             
             {/* App routes with layout */}
             <Route path="/" element={<Layout><Dashboard /></Layout>} />
             <Route path="/stock/:symbol" element={<Layout><StockDetail /></Layout>} />
             <Route path="/news" element={<Layout><NewsAnalysis /></Layout>} />
+            <Route path="/admin" element={<Layout><AdminPanel /></Layout>} />
           </Routes>
         </Router>
         {/* React Query Devtools - only in development */}

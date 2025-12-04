@@ -1,4 +1,4 @@
-import { Search, X, TrendingUp } from 'lucide-react';
+import { Search, X, Plus, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { stockAPI } from '../services/api';
 
@@ -42,15 +42,15 @@ export default function StockSearch({ onSelect }) {
   };
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by company name or symbol (e.g., Apple, AAPL, Tesla)..."
-          className="input pl-10 pr-10"
+          placeholder="Search to add stock..."
+          className="input pl-9 pr-9 w-full bg-background"
         />
         {query && (
           <button
@@ -59,24 +59,23 @@ export default function StockSearch({ onSelect }) {
               setResults([]);
               setShowResults(false);
             }}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground p-1"
           >
-            <X className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+            <X className="h-3 w-3" />
           </button>
         )}
       </div>
 
       {showResults && (
-        <div className="absolute z-10 w-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 max-h-96 overflow-y-auto">
+        <div className="absolute z-50 w-full mt-1 bg-popover text-popover-foreground rounded-md shadow-md border animate-in fade-in zoom-in-95 duration-200 max-h-80 overflow-y-auto">
           {loading ? (
-            <div className="p-4 text-center text-gray-500">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2"></div>
+            <div className="p-4 text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
               Searching...
             </div>
           ) : results.length > 0 ? (
-            <div className="py-2">
+            <div className="p-1">
               {results.map((result, index) => {
-                // Support multiple data formats
                 const symbol = result.symbol || result['1. symbol'];
                 const name = result.longname || result.shortname || result['2. name'] || symbol;
                 const type = result.quoteType || result['3. type'] || 'EQUITY';
@@ -86,31 +85,30 @@ export default function StockSearch({ onSelect }) {
                   <button
                     key={index}
                     onClick={() => handleSelect(symbol)}
-                    className="w-full px-4 py-3 hover:bg-blue-50 text-left transition-colors border-b border-gray-100 last:border-0"
+                    className="w-full px-3 py-2 hover:bg-accent hover:text-accent-foreground rounded-sm text-left transition-colors flex items-center justify-between group"
                   >
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <p className="font-bold text-gray-900 text-lg">{symbol}</p>
-                          <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">
-                            {type}
+                    <div className="flex-1 min-w-0 mr-4">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold">{symbol}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 bg-secondary text-secondary-foreground rounded-full font-medium">
+                          {type}
+                        </span>
+                        {region !== 'US' && (
+                          <span className="text-[10px] text-muted-foreground">
+                            {region}
                           </span>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">{name}</p>
+                        )}
                       </div>
-                      <div className="flex items-center gap-2 ml-4">
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">{region}</span>
-                        <TrendingUp className="w-4 h-4 text-green-500" />
-                      </div>
+                      <p className="text-xs text-muted-foreground truncate mt-0.5">{name}</p>
                     </div>
+                    <Plus className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                   </button>
                 );
               })}
             </div>
           ) : query.length >= 2 ? (
-            <div className="p-4 text-center text-gray-500">
-              <p className="font-medium">No results found</p>
-              <p className="text-sm mt-1">Try searching for: Apple, Tesla, Microsoft, or stock symbols like AAPL, TSLA</p>
+            <div className="p-4 text-center text-sm text-muted-foreground">
+              No results found
             </div>
           ) : null}
         </div>
@@ -118,4 +116,3 @@ export default function StockSearch({ onSelect }) {
     </div>
   );
 }
-

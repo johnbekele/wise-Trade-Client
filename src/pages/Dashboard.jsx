@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import StockCard from '../components/StockCard';
 import StockSearch from '../components/StockSearch';
 import { useWatchlist, useMarketMovers } from '../hooks/useStocks';
-import { TrendingUp, TrendingDown, Activity, RefreshCw } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity, RefreshCw, Plus, ArrowRight } from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -47,131 +47,172 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Trading Dashboard</h1>
-          <p className="text-gray-500 mt-1">Real-time stock market information</p>
+          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+          <p className="text-muted-foreground">Overview of your watchlist and market trends.</p>
         </div>
-        <button 
-          onClick={handleRefresh}
-          disabled={isLoading || loadingMovers}
-          className="btn btn-primary flex items-center gap-2"
-        >
-          <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
-          Refresh
-        </button>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+          <div className="w-full sm:w-64">
+            <StockSearch onSelect={handleAddStock} />
+          </div>
+          <button 
+            onClick={handleRefresh}
+            disabled={isLoading || loadingMovers}
+            className="btn btn-outline whitespace-nowrap"
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+        </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="card">
-        <h2 className="text-lg font-semibold mb-4">Add Stock to Watchlist</h2>
-        <StockSearch onSelect={handleAddStock} />
-      </div>
-
-      {/* Market Movers */}
-      {marketMovers && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="card bg-gradient-to-br from-green-50 to-white">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-green-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900">Top Gainers</h3>
-            </div>
-            <div className="space-y-2">
-              {marketMovers.top_gainers?.slice(0, 3).map((stock, index) => (
-                <div key={index} className="flex justify-between items-center text-sm">
-                  <span className="font-medium">{stock.ticker}</span>
-                  <span className="text-green-600 font-medium">
-                    +{parseFloat(stock.change_percentage).toFixed(2)}%
-                  </span>
-                </div>
-              ))}
-            </div>
+      {/* Market Movers Section */}
+      <div className="grid gap-4 md:grid-cols-3">
+        {/* Gainers */}
+        <div className="card">
+          <div className="card-header pb-2">
+            <div className="text-sm font-medium text-muted-foreground">Top Gainers</div>
+            <h3 className="text-2xl font-bold flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-green-500" />
+              Market Leaders
+            </h3>
           </div>
-
-          <div className="card bg-gradient-to-br from-red-50 to-white">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <TrendingDown className="w-6 h-6 text-red-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900">Top Losers</h3>
-            </div>
-            <div className="space-y-2">
-              {marketMovers.top_losers?.slice(0, 3).map((stock, index) => (
-                <div key={index} className="flex justify-between items-center text-sm">
-                  <span className="font-medium">{stock.ticker}</span>
-                  <span className="text-red-600 font-medium">
-                    {parseFloat(stock.change_percentage).toFixed(2)}%
-                  </span>
+          <div className="card-content">
+            <div className="space-y-4">
+              {loadingMovers ? (
+                <div className="space-y-2">
+                   {[1, 2, 3].map(i => <div key={i} className="h-8 bg-muted animate-pulse rounded" />)}
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="card bg-gradient-to-br from-blue-50 to-white">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Activity className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900">Most Active</h3>
-            </div>
-            <div className="space-y-2">
-              {marketMovers.most_actively_traded?.slice(0, 3).map((stock, index) => (
-                <div key={index} className="flex justify-between items-center text-sm">
-                  <span className="font-medium">{stock.ticker}</span>
-                  <span className="text-gray-600 text-xs">
-                    Vol: {parseInt(stock.volume).toLocaleString()}
-                  </span>
-                </div>
-              ))}
+              ) : (
+                marketMovers?.top_gainers?.slice(0, 3).map((stock, index) => (
+                  <div key={index} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="font-semibold">{stock.ticker}</div>
+                      <div className="text-xs text-muted-foreground hidden xl:block">${stock.price}</div>
+                    </div>
+                    <div className="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded">
+                      +{parseFloat(stock.change_percentage).toFixed(2)}%
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
-      )}
 
-      {/* Watchlist */}
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Your Watchlist</h2>
+        {/* Losers */}
+        <div className="card">
+          <div className="card-header pb-2">
+            <div className="text-sm font-medium text-muted-foreground">Top Losers</div>
+            <h3 className="text-2xl font-bold flex items-center gap-2">
+              <TrendingDown className="h-5 w-5 text-destructive" />
+              Market Laggards
+            </h3>
+          </div>
+          <div className="card-content">
+            <div className="space-y-4">
+              {loadingMovers ? (
+                <div className="space-y-2">
+                   {[1, 2, 3].map(i => <div key={i} className="h-8 bg-muted animate-pulse rounded" />)}
+                </div>
+              ) : (
+                marketMovers?.top_losers?.slice(0, 3).map((stock, index) => (
+                  <div key={index} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="font-semibold">{stock.ticker}</div>
+                      <div className="text-xs text-muted-foreground hidden xl:block">${stock.price}</div>
+                    </div>
+                    <div className="text-sm font-medium text-destructive bg-destructive/10 px-2 py-1 rounded">
+                      {parseFloat(stock.change_percentage).toFixed(2)}%
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Active */}
+        <div className="card">
+          <div className="card-header pb-2">
+            <div className="text-sm font-medium text-muted-foreground">Most Active</div>
+            <h3 className="text-2xl font-bold flex items-center gap-2">
+              <Activity className="h-5 w-5 text-blue-500" />
+              High Volume
+            </h3>
+          </div>
+          <div className="card-content">
+            <div className="space-y-4">
+              {loadingMovers ? (
+                <div className="space-y-2">
+                   {[1, 2, 3].map(i => <div key={i} className="h-8 bg-muted animate-pulse rounded" />)}
+                </div>
+              ) : (
+                marketMovers?.most_actively_traded?.slice(0, 3).map((stock, index) => (
+                  <div key={index} className="flex items-center justify-between">
+                    <div className="font-semibold">{stock.ticker}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {parseInt(stock.volume).toLocaleString()}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Watchlist Section */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-xl font-semibold tracking-tight">Your Watchlist</h3>
+          <p className="text-sm text-muted-foreground">Track your favorite stocks in real-time</p>
+        </div>
+
         {isLoading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-            <p className="mt-4 text-gray-500">Loading stocks...</p>
-          </div>
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="card h-48 animate-pulse bg-muted/20"></div>
+              ))}
+           </div>
         ) : isError ? (
-          <div className="card bg-red-50 border-red-200 text-center py-12">
-            <p className="text-red-700 font-medium">Error loading stocks</p>
-            <button onClick={refetchStocks} className="btn btn-primary mt-4">
-              Try Again
+          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-8 text-center text-destructive">
+            <p className="font-medium">Error loading watchlist data</p>
+            <button onClick={refetchStocks} className="btn btn-outline border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground mt-4">
+              Retry
             </button>
           </div>
+        ) : watchlist.length === 0 ? (
+           <div className="text-center py-16 border-2 border-dashed rounded-lg">
+             <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+             <h3 className="text-lg font-medium">Your watchlist is empty</h3>
+             <p className="text-muted-foreground mb-6">Search for stocks above to start tracking them.</p>
+           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {watchlist.map((symbol) => (
-              <div key={symbol} className="relative">
+              <div key={symbol} className="group relative">
                 <button
                   onClick={() => handleRemoveStock(symbol)}
-                  className="absolute top-2 right-2 z-10 p-1 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors"
+                  className="absolute -top-2 -right-2 z-10 p-1.5 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-destructive/90"
+                  title="Remove from watchlist"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
-                <StockCard
-                  symbol={symbol}
-                  data={stockDataMap[symbol]}
-                  onClick={() => navigate(`/stock/${symbol}`)}
-                />
+                <div className="h-full transition-transform hover:-translate-y-1 duration-200">
+                  <StockCard
+                    symbol={symbol}
+                    data={stockDataMap[symbol]}
+                    onClick={() => navigate(`/stock/${symbol}`)}
+                  />
+                </div>
               </div>
             ))}
-          </div>
-        )}
-        
-        {watchlist.length === 0 && !isLoading && (
-          <div className="card text-center py-12">
-            <p className="text-gray-500">No stocks in watchlist. Add some using the search above!</p>
           </div>
         )}
       </div>

@@ -1,16 +1,35 @@
-FROM node:lts
+# Build stage
+FROM node:lts AS build
 
 WORKDIR /app
 
 # Copy package files first for better caching
 COPY package*.json ./
-
-# Install dependencies (these will be in named volume in production)
 RUN npm install
 
-# Copy the rest of the application
+# Copy source code
 COPY . .
 
-EXPOSE 3000
+# Build arguments
+ARG VITE_API_BASE_URL=/api
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
-CMD ["npm", "run", "dev"]
+# Build the application
+RUN npm run build
+
+# Production stage with nginx
+FROM nginx:stable-alpine
+
+# Copy built files from build stage
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:80 || exit 1
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
