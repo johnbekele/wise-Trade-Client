@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { TrendingUp, Newspaper, BarChart3, Menu, LogOut, LogIn, User, X, Shield } from 'lucide-react';
+import { TrendingUp, Newspaper, BarChart3, Menu, LogOut, LogIn, User, X, Shield, Key, BookOpen } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
@@ -12,6 +12,8 @@ export default function Layout({ children }) {
   const navigation = [
     { name: 'Dashboard', href: '/', icon: BarChart3 },
     { name: 'AI Trading Insights', href: '/news', icon: Newspaper },
+    { name: 'API Keys', href: '/api-keys', icon: Key },
+    { name: 'API Documentation', href: '/api-docs', icon: BookOpen },
   ];
 
   const isAdmin = user?.is_super_Admin;

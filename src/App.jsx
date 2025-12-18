@@ -12,6 +12,8 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import ResendVerification from './pages/ResendVerification'
 import AdminPanel from './pages/AdminPanel'
+import ApiKeys from './pages/ApiKeys'
+import ApiDocumentation from './pages/ApiDocumentation'
 import Layout from './components/Layout'
 
 // Create React Query client
@@ -45,6 +47,8 @@ function App() {
             <Route path="/stock/:symbol" element={<Layout><StockDetail /></Layout>} />
             <Route path="/news" element={<Layout><NewsAnalysis /></Layout>} />
             <Route path="/admin" element={<Layout><AdminPanel /></Layout>} />
+            <Route path="/api-keys" element={<Layout><ApiKeys /></Layout>} />
+            <Route path="/api-docs" element={<Layout><ApiDocumentation /></Layout>} />
           </Routes>
         </Router>
         {/* React Query Devtools - only in development */}
